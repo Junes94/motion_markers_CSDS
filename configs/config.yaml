@@ -1,0 +1,79 @@
+project:
+  name: MotionMap-Kinematics
+
+paths:
+  # Input data
+  pose_dir: data/pose_traj
+  group_index_csv: data/SIT/SIratio.csv
+  # Optional: point directly to a scalars CSV (e.g., ablation output) instead of results/scalar_summaries.csv
+  scalars_csv: null
+
+  # Outputs
+  results_dir: results
+  histogram_dir: results/scalar_histograms
+  tables_dir: results/tables
+  figures_dir: results/figures
+
+parameters:
+  # Scalar summary
+  fps: 20
+  smoothing_window: 5
+  origin: [0.0, 0.0]
+  centerpoint: [head, torso]
+  length_criteria: [head, anus]
+  height_criteria: [head, anus]
+  velocity_criteria: [head, torso]
+  start: null
+  end: null
+
+  # Column labeling and filtering
+  # Provide either `labels` inline or `labels_file` (one label per line). If omitted, use CSV headers.
+  labels: ['nose_x', 'nose_y', 'nose_z', 'head_x', 'head_y', 'head_z', 'anus_x', 'anus_y',
+         'anus_z', 'torso_x', 'torso_y', 'torso_z', 'RF_x', 'RF_y', 'RF_z', 'LF_x', 'LF_y', 'LF_z',
+         'RH_x', 'RH_y', 'RH_z', 'LH_x', 'LH_y', 'LH_z', 'tail_x', 'tail_y', 'tail_z']
+  labels_file: null
+  # Set to true if your pose CSVs include a header row to keep; false if raw data has no header line
+  pose_has_header: false
+  # Exclude entire keypoints (base names) from analysis, e.g., [tail, RF, LF]
+  exclude_keypoints: []
+  # Coordinate suffixes; adjust if your data is 2D or uses different suffixes
+  coord_suffixes: [_x, _y, _z]
+
+  # Variables used throughout the pipeline
+  variables: [distance_from_origin, velocity_xy, angle_to_origin, length, height, torso_angle]
+
+  # Histogram settings
+  bin_method: manual   # one of: freedman_diaconis, sturges, scott, manual
+  manual_bin_width_distance_like: 1.0   # used when bin_method = manual for distance/velocity/length/height
+  manual_bin_width_angle_like: 0.5235987756   # 30 degrees in radians
+  save_plots: false
+  # Optional per-variable bins. If set, overrides bin_method for that variable.
+  # Use an integer for number of bins (computed across 1st–99th percentile),
+  # or provide explicit bin edges as a list.
+  # Example:
+  # variable_bins:
+  #   distance_from_origin: 10
+  #   velocity_xy: 15
+  #   angle_to_origin: 6
+  #   length: 8
+  #   height: 7
+  #   torso_angle: 6
+  variable_bins: {
+    distance_from_origin: 10,
+    velocity_xy: 15,
+    angle_to_origin: 6,
+    length: 8,
+    height: 7,
+    torso_angle: 6
+  }
+
+  # Ablation (optional). Used by step_replace_syllables.
+  ablation:
+    input_csv: data/kp_moseq/moseq_df_with_scalars.csv
+    output_csv: results/moseq_df_with_scalars_replace_syll.csv
+    exclude_syllables: [3, 12]
+    random_seed: 42
+
+analysis:
+  # Available steps: compute_scalars, optimize_bins, build_histograms
+  steps: [compute_scalars, build_histograms]

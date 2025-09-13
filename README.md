@@ -1,4 +1,4 @@
-# Kinematic Analysis Pipeline
+# Kinematic & Motion syllables Analysis Pipeline
 
 This repository provides a clean, reproducible analysis pipeline for computing kinematic scalar features from pose trajectories and aggregating them into histogram data used for figures and downstream analysis.
 

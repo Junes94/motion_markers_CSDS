@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.env
+.pytest_cache/
+.mypy_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Project data and results (keep placeholders)
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Results (keep placeholders)
+results/*
+!results/.gitkeep
+results/figures/*
+!results/figures/.gitkeep
+results/tables/*
+!results/tables/.gitkeep
+results/scalar_histograms/*
+!results/scalar_histograms/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+data/**/*.csv
+outputs/**/*.csv

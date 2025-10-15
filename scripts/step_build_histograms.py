@@ -19,7 +19,7 @@ def _add_src_to_path() -> None:
 
 _add_src_to_path()
 
-from paper_analysis.utils import ensure_dir  # noqa: E402
+from src.utils import ensure_dir  # noqa: E402
 
 
 def _compute_bin_edges(values: np.ndarray, method: str, manual_width: float | None = None) -> np.ndarray:

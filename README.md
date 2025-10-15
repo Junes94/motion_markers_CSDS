@@ -11,10 +11,11 @@ Repo_for_journal/
 ├─ .gitignore                     # Ignore large/generated files
 ├─ configs/
 │  └─ config.yaml                 # Project configuration (paths, params)
-├─ src/
-│  └─ paper_analysis/             # Reusable analysis code (package)
-│     ├─ __init__.py
-│     └─ utils.py
+├─ src/                           # Reusable analysis code (package)
+│  ├─ __init__.py
+│  ├─ utils.py
+│  ├─ features.py
+│  └─ io.py
 ├─ scripts/
 │  ├─ run_pipeline.py             # Orchestrates pipeline steps
 │  ├─ step_preprocess.py          # Data cleaning / preprocessing

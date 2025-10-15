@@ -18,9 +18,9 @@ def _add_src_to_path() -> None:
 
 _add_src_to_path()
 
-from paper_analysis.io import load_pose_folder  # noqa: E402
-from paper_analysis.utils import ensure_dir  # noqa: E402
-from paper_analysis.features import compute_scalar_summary  # noqa: E402
+from src.io import load_pose_folder  # noqa: E402
+from src.utils import ensure_dir  # noqa: E402
+from src.features import compute_scalar_summary  # noqa: E402
 
 
 def run(cfg: Dict[str, Any]) -> None:

@@ -29,8 +29,8 @@ parameters:
   # Column labeling and filtering
   # Provide either `labels` inline or `labels_file` (one label per line). If omitted, use CSV headers.
   labels: ['nose_x', 'nose_y', 'nose_z', 'head_x', 'head_y', 'head_z', 'anus_x', 'anus_y',
-         'anus_z', 'torso_x', 'torso_y', 'torso_z', 'RF_x', 'RF_y', 'RF_z', 'LF_x', 'LF_y', 'LF_z',
-         'RH_x', 'RH_y', 'RH_z', 'LH_x', 'LH_y', 'LH_z', 'tail_x', 'tail_y', 'tail_z']
+         'anus_z', 'torso_x', 'torso_y', 'torso_z', 'RH_x', 'RH_y', 'RH_z', 'LH_x', 'LH_y', 'LH_z', 
+         'RF_x', 'RF_y', 'RF_z', 'LF_x', 'LF_y', 'LF_z', 'tail_x', 'tail_y', 'tail_z']
   labels_file: null
   # Set to true if your pose CSVs include a header row to keep; false if raw data has no header line
   pose_has_header: false

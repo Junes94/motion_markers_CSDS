@@ -29,8 +29,8 @@ parameters:
   # Column labeling and filtering
   # Provide either `labels` inline or `labels_file` (one label per line). If omitted, use CSV headers.
   labels: ['nose_x', 'nose_y', 'nose_z', 'head_x', 'head_y', 'head_z', 'anus_x', 'anus_y',
-         'anus_z', 'torso_x', 'torso_y', 'torso_z', 'RF_x', 'RF_y', 'RF_z', 'LF_x', 'LF_y', 'LF_z',
-         'RH_x', 'RH_y', 'RH_z', 'LH_x', 'LH_y', 'LH_z', 'tail_x', 'tail_y', 'tail_z']
+         'anus_z', 'torso_x', 'torso_y', 'torso_z', 'RH_x', 'RH_y', 'RH_z', 'LH_x', 'LH_y', 'LH_z', 
+         'RF_x', 'RF_y', 'RF_z', 'LF_x', 'LF_y', 'LF_z', 'tail_x', 'tail_y', 'tail_z']
   labels_file: null
   # Set to true if your pose CSVs include a header row to keep; false if raw data has no header line
   pose_has_header: false
@@ -58,14 +58,13 @@ parameters:
   #   length: 8
   #   height: 7
   #   torso_angle: 6
-  variable_bins: {
-    distance_from_origin: 10,
-    velocity_xy: 15,
-    angle_to_origin: 6,
-    length: 8,
-    height: 7,
-    torso_angle: 6
-  }
+  variable_bins:
+    angle_to_origin: [0.0422973755, 0.55170478, 1.061112185, 1.5705195895, 2.0799269945, 2.5893343995, 3.0987418045]
+    distance_from_origin: [1.290847067, 2.126688357, 2.962529647, 3.798370937, 4.634212227, 5.470053517, 6.305894807, 7.141736097, 7.977577387, 8.813418677, 9.649259967]
+    height: [-0.447680016, 0.4998451215, 1.447370258, 2.394895394, 3.3424205315, 4.289945668, 5.2374708045, 6.184995941]
+    length: [1.188861866, 1.882931002, 2.5770001375, 3.271069273, 3.9651384085, 4.659207544, 5.3532766795, 6.047345815, 6.741414951]
+    torso_angle: [0.2830844305, 0.7587586035, 1.2344327765, 1.7101069495, 2.185781123, 2.6614552965, 3.1371294695]
+    velocity_xy: [0.0525766155, 1.2418401145, 2.4311036135, 3.6203671125, 4.8096306115, 5.9988941105, 7.1881576100, 8.3774211095, 9.5666846095, 10.7559481100, 11.9452116100, 13.1344751100, 14.3237386050, 15.5130021000, 16.7022656000, 17.8915291000]
 
   # Ablation (optional). Used by step_replace_syllables.
   ablation:

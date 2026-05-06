@@ -3,23 +3,23 @@ project:
 
 paths:
   # Input data
-  pose_dir: data/pose_traj
-  group_index_csv: data/SIT/SIratio.csv
+  pose_dir: T:\2.실험데이터\AVATAR-SDSBD\dataset5\preSD
+  group_index_csv: C:\Users\MyPC\Desktop\git\kp_moseq\keypoint-moseq\project\SDSBD\dataset5\trainset1\index_z1.5.csv
   # Optional: point directly to a scalars CSV (e.g., ablation output) instead of results/scalar_summaries.csv
   scalars_csv: null
 
   # Outputs
-  results_dir: results
-  histogram_dir: results/scalar_histograms
-  tables_dir: results/tables
-  figures_dir: results/figures
+  results_dir: T:\2.실험데이터\AVATAR-SDSBD\dataset5_revision\original_updated\results
+  histogram_dir: T:\2.실험데이터\AVATAR-SDSBD\dataset5_revision\original_updated\results\scalar_histograms
+  tables_dir: T:\2.실험데이터\AVATAR-SDSBD\dataset5_revision\original_updated\results\tables
+  figures_dir: T:\2.실험데이터\AVATAR-SDSBD\dataset5_revision\original_updated\results\figures
 
 parameters:
   # Scalar summary
   fps: 20
   smoothing_window: 5
   origin: [0.0, 0.0]
-  centerpoint: [torso, torso] #[head, torso]
+  centerpoint: [torso, torso]
   length_criteria: [head, anus]
   height_criteria: [head, anus]
   velocity_criteria: [head, torso]

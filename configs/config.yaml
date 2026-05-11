@@ -74,6 +74,10 @@ parameters:
     exclude_syllables: [3, 12]
     random_seed: 42
 
+  # Cohort export settings for group_mouse_averages_all.csv
+  cohort_divisor: 100 # cohort=1 if mouse IDs are like 101, 102, etc. Adjust based on your ID format.
+  cohort_id_regex: '(\d+)$'
+
 analysis:
-  # Available steps: compute_scalars, optimize_bins, build_histograms
-  steps: [compute_scalars, build_histograms]
+  # Available steps: compute_scalars, optimize_bins, build_histograms, export_cohort_csvs
+  steps: [compute_scalars, build_histograms, export_cohort_csvs]

@@ -74,10 +74,21 @@ parameters:
     exclude_syllables: [3, 12]
     random_seed: 42
 
-  # Cohort export settings for group_mouse_averages_all.csv
-  cohort_divisor: 100 # cohort=1 if mouse IDs are like 101, 102, etc. Adjust based on your ID format.
-  cohort_id_regex: '(\d+)$'
+  # Animal size summary from walk/rearing frames.
+  # All rearing/walk thresholds use B6J defaults (see step_animal_size.py for details).
+  # To override defaults for this experiment, uncomment and customize parameters below.
+  # Example overrides (all optional):
+  #   instances:
+  #     max_instances_per_recording: 10
+  #   rearing:
+  #     baseline_percentile: 25
+  #     height_factor: 2.0
+  #   walk:
+  #     velocity_threshold: 0.1
+  animal_size:
+    enabled: true
+    # Uncomment sections below to override B6J defaults
 
 analysis:
-  # Available steps: compute_scalars, optimize_bins, build_histograms, export_cohort_csvs
-  steps: [compute_scalars, build_histograms, export_cohort_csvs]
+  # Available steps: compute_scalars, animal_size, optimize_bins, build_histograms, export_cohort_csvs
+  steps: [compute_scalars, animal_size, build_histograms, export_cohort_csvs]

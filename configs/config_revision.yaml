@@ -74,6 +74,13 @@ parameters:
     exclude_syllables: [3, 12]
     random_seed: 42
 
+  # Animal size summary from walk/rearing frames.
+  # Defaults use B6J rearing/walk thresholds from step_animal_size.py.
+  # To override, uncomment desired sections below.
+  animal_size:
+    enabled: true
+    # Optional: override instances, rearing, or walk defaults here
+
 analysis:
-  # Available steps: compute_scalars, optimize_bins, build_histograms
-  steps: [compute_scalars, build_histograms]
+  # Available steps: compute_scalars, animal_size, optimize_bins, build_histograms, export_cohort_csvs
+  steps: [compute_scalars, animal_size, build_histograms, export_cohort_csvs]

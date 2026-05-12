@@ -20,21 +20,21 @@ DEFAULT_ANIMAL_SIZE_CFG: Dict[str, Any] = {
     },
     "rearing": {
         "center_reference": "torso",
-        "center_keypoints": ["head", "torso"],
+        "center_keypoints": ["head", "torso"],  # used only if center_reference is "midpoint"
         "hindlimb_keypoints": ["RH", "LH"],
         "baseline_percentile": 25,
-        "height_factor": 2.0,
-        "min_center_rise": 1.5,
-        "min_hind_height": 2.0,
-        "median_window_seconds": 0.25,
+        "height_factor": 2.5,
+        "min_center_rise": 2.5,
+        "hindlimb_floor_percentile": 10,
+        "min_hind_rise": 1.5,
         "min_duration_seconds": 0.5,
     },
     "walk": {
         "head_keypoint": "head",
         "torso_keypoint": "torso",
-        "velocity_threshold": 0.1,
-        "angle_threshold_deg": 90,
-        "bout_distance_threshold": 5.0,
+        "velocity_threshold": 0.5,
+        "angle_threshold_deg": 45,
+        "bout_distance_threshold": 10.0,
     },
 }
 
@@ -155,7 +155,7 @@ def _resolve_center_z(data: pd.DataFrame, center_reference: str, center_keypoint
     raise ValueError("animal_size.rearing.center_reference must be one of [midpoint, torso, head]")
 
 
-def _rearing_bool(data: pd.DataFrame, fps: float, animal_cfg: Dict[str, Any]) -> pd.Series:
+def _rearing_bool(data: pd.DataFrame, fps: float, animal_cfg: Dict[str, Any], smoothing_window: int = 5) -> pd.Series:
     rear = animal_cfg["rearing"]
     center_reference = str(rear.get("center_reference", "torso"))
     center_keypoints = rear.get("center_keypoints", ["head", "torso"])
@@ -164,10 +164,10 @@ def _rearing_bool(data: pd.DataFrame, fps: float, animal_cfg: Dict[str, Any]) ->
         raise ValueError("animal_size.rearing.hindlimb_keypoints must have exactly 2 keypoints")
 
     baseline_percentile = float(rear.get("baseline_percentile", 25.0))
-    height_factor = float(rear.get("height_factor", 2.0))
-    min_center_rise = float(rear.get("min_center_rise", 1.5))
-    min_hind_height = float(rear.get("min_hind_height", 2.0))
-    median_window_seconds = float(rear.get("median_window_seconds", 0.25))
+    height_factor = float(rear.get("height_factor", 2.5))
+    min_center_rise = float(rear.get("min_center_rise", 2.5))
+    hindlimb_floor_percentile = float(rear.get("hindlimb_floor_percentile", 10.0))
+    min_hind_rise = float(rear.get("min_hind_rise", 1.5))
     min_duration_seconds = float(rear.get("min_duration_seconds", 0.5))
 
     center_z = _resolve_center_z(data, center_reference, center_keypoints)
@@ -176,9 +176,15 @@ def _rearing_bool(data: pd.DataFrame, fps: float, animal_cfg: Dict[str, Any]) ->
 
     baseline = float(np.percentile(center_z.dropna().to_numpy(dtype=float), baseline_percentile))
     threshold = max(baseline * height_factor, baseline + min_center_rise)
-    raw = (center_z > threshold) & ((h1_z < min_hind_height) | (h2_z < min_hind_height))
 
-    median_window = _ensure_odd_window(round(fps * median_window_seconds))
+    # Estimate floor z from hindlimb data to handle chambers where z < 0.
+    # Both hindlimbs must simultaneously be near floor (AND) for conservative rearing detection.
+    all_hind_z = np.concatenate([h1_z.dropna().to_numpy(dtype=float), h2_z.dropna().to_numpy(dtype=float)])
+    hind_floor = float(np.percentile(all_hind_z, hindlimb_floor_percentile))
+    hind_ceiling = hind_floor + min_hind_rise
+    raw = (center_z > threshold) & (h1_z < hind_ceiling) & (h2_z < hind_ceiling)
+
+    median_window = _ensure_odd_window(smoothing_window)
     min_duration_frames = max(1, int(round(fps * min_duration_seconds)))
 
     smoothed = raw.rolling(window=median_window, center=True, min_periods=1).median() == 1
@@ -188,7 +194,7 @@ def _rearing_bool(data: pd.DataFrame, fps: float, animal_cfg: Dict[str, Any]) ->
     return final.fillna(False).astype(bool)
 
 
-def _walk_bool(data: pd.DataFrame, fps: float, rearing_bool: pd.Series, animal_cfg: Dict[str, Any]) -> pd.Series:
+def _walk_bool(data: pd.DataFrame, fps: float, rearing_bool: pd.Series, animal_cfg: Dict[str, Any], smoothing_window: int = 5) -> pd.Series:
     walk = animal_cfg["walk"]
     head_kp = str(walk.get("head_keypoint", "head"))
     torso_kp = str(walk.get("torso_keypoint", "torso"))
@@ -216,10 +222,12 @@ def _walk_bool(data: pd.DataFrame, fps: float, rearing_bool: pd.Series, animal_c
     crit_angle = (ang_head < angle_threshold_deg) & (ang_torso < angle_threshold_deg)
 
     walk123 = (crit_speed & crit_angle & (~rearing_bool)).fillna(False)
-    out = walk123.copy()
+    median_window = _ensure_odd_window(smoothing_window)
+    smoothed = walk123.rolling(window=median_window, center=True, min_periods=1).median() == 1
+    out = smoothed.copy()
 
     torso_speed = speed_torso.fillna(0.0)
-    for start, end in _contiguous_true_segments(walk123):
+    for start, end in _contiguous_true_segments(smoothed):
         if float(torso_speed.iloc[start : end + 1].sum()) < bout_distance_threshold:
             out.iloc[start : end + 1] = False
     return out.astype(bool)
@@ -323,8 +331,9 @@ def run(cfg: Dict[str, Any]) -> None:
                 velocity_criteria=velocity_criteria,
             )
 
-            rear_mask = _rearing_bool(df, fps=fps, animal_cfg=animal_cfg)
-            walk_mask = _walk_bool(df, fps=fps, rearing_bool=rear_mask, animal_cfg=animal_cfg)
+            sw = int(smoothing_window) if smoothing_window else 5
+            rear_mask = _rearing_bool(df, fps=fps, animal_cfg=animal_cfg, smoothing_window=sw)
+            walk_mask = _walk_bool(df, fps=fps, rearing_bool=rear_mask, animal_cfg=animal_cfg, smoothing_window=sw)
             walk_segments = _contiguous_true_segments(walk_mask)
             rear_segments = _contiguous_true_segments(rear_mask)
             walk_segments_by_name[name] = walk_segments
